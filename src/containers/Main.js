@@ -37,6 +37,7 @@ class Main extends React.Component {
                 onClose={this.props.removeWindow}
                 active={this.props.active}
                 setActive={this.setActive}
+		order={this.props.order}
             />
         )
     }

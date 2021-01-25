@@ -13,7 +13,7 @@ const mainReduxer = new (class {
     }
 
     actions = {
-        setActive: (state, active) => ({ ...state, active }),
+        setActiveInner: (state, active) => ({ ...state, active }),
         setWindows: (state, windows) => ({ ...state, windows }),
         setOrder: (state, order) => ({ ...state, order }),
         setLocale: (state, locale) => ({ ...state, locale }),

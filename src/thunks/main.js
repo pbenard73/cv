@@ -1,50 +1,61 @@
+import arrayMove from 'array-move'
+
 const thunks = {
-    addWindow: windowData => {
-        return (dispatch, getState, windowData) => {
-            const state = getState()
-            const windows = { ...state.windows }
-            const order = [...state.order]
-            const uuid = windowData.uuid
-            //const index = order.indexOf(uuid)
+    setActive: uuid => (dispatch, getState, uuid) => {
+        let state = getState()
+        let order = [...state.order]
+        const index = order.indexOf(uuid)
+        order = arrayMove(order, index, order.length - 1)
 
-            if (windows[uuid] !== undefined) {
-                dispatch("setActive", uuid)
-                return
-            }
-
-            windows[uuid] = windowData
-            order.push(uuid)
-
-            dispatch("setWindows", windows)
-            dispatch("setOrder", order)
-            dispatch("setActive", uuid)
-        }
+        dispatch("setOrder", order)
+        dispatch("setActiveInner", uuid)
     },
-    removeWindow: uuid => {
-        return (dispatch, getState, uuid) => {
-            const state = getState()
-            const windows = { ...state.windows }
-            const order = [...state.order]
+    addWindow: windowData => (dispatch, getState, windowData) => {
+        const state = getState()
+        const windows = { ...state.windows }
+        let order = [...state.order]
+        const uuid = windowData.uuid
 
-            if (windows[uuid] === undefined) {
-                return
-            }
+        if (windows[uuid] !== undefined) {
+            dispatch("setActive", uuid)
+            return
+        }
 
-            const index = order.indexOf(uuid)
+        const index = order.indexOf(uuid)
+        if (index === -1) {
+            order.push(uuid)
+        } else {
+            order = arrayMove(order, index, order.length - 1)
+        }
 
-            delete windows[uuid]
+        windows[uuid] = windowData
 
-            dispatch("setWindows", windows)
+        dispatch("setOrder", order)
+        dispatch("setWindows", windows)
+        dispatch("setActive", uuid)
+    },
+    removeWindow: uuid => (dispatch, getState, uuid) => {
+        const state = getState()
+        const windows = { ...state.windows }
+        let order = [...state.order]
 
-            if (index !== -1) {
-                order.splice(index, 1)
+        if (windows[uuid] === undefined) {
+            return
+        }
 
-                dispatch("setOrder", order)
-            }
+        delete windows[uuid]
 
-            if (order.length > 0) {
-                dispatch("setActive", order[order.length - 1])
-            }
+        const index = order.indexOf(uuid)
+        dispatch("setWindows", windows)
+
+        if (index !== -1) {
+            order.splice(index, 1)
+
+            dispatch("setOrder", order)
+        }
+
+        if (order.length > 0) {
+            dispatch("setActive", order[order.length - 1])
         }
     },
 }
